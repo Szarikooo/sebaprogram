@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cennik</title>
+  <link rel="stylesheet" href="1.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f7f9;
+    }
+    .container {
+      text-align: center;
+      width: 90%;
+      max-width: 1000px;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    input[type='number'] {
+      width: 80px;
+      padding: 5px;
+    }
+    .menu-button {
+      display: inline-block;
+      margin-top: 20px;
+      background-color: #3498db;
+      color: white;
+      padding: 10px 25px;
+      border-radius: 8px;
+      font-size: 16px;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+    .menu-button:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Wybór Produktów Grenton</h1>
+
+    <table id="productTable">
+      <thead>
+        <tr><th>Produkt</th><th>Cena (zł)</th><th>Dodaj</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h3>Koszyk</h3>
+    <table id="cartTable">
+      <thead>
+        <tr><th>Produkt</th><th>Cena (zł)</th><th>Edytuj</th><th>Usuń</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <p><strong>Łączny koszt:</strong> <span id="total">0</span> zł</p>
+
+    <!-- Dodaj przycisk "Koszyk" -->
+    <a href="koszyk.html" class="menu-button">Koszyk</a> <!-- Link do strony koszyka -->
+    <a href="index.html" class="menu-button">Powrót do menu</a>
+  </div>
+
+  <script>
+    const products = [
+      { name: "Smart Relay 4HP", price: 450 },
+      { name: "Dimmer 2CH", price: 380 },
+      { name: "LED RGBW", price: 290 },
+      { name: "IO Module 8x8", price: 320 },
+      { name: "Analog In/Out", price: 275 }
+    ];
+
+    let cart = JSON.parse(localStorage.getItem("grenton_cart")) || [];
+
+    const productTable = document.querySelector("#productTable tbody");
+    const cartTable = document.querySelector("#cartTable tbody");
+    const totalSpan = document.getElementById("total");
+
+    function renderProducts() {
+      products.forEach(p => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${p.name}</td><td>${p.price}</td><td><button onclick='addToCart("${p.name}", ${p.price})'>Dodaj</button></td>`;
+        productTable.appendChild(tr);
+      });
+    }
+
+    function renderCart() {
+      cartTable.innerHTML = "";
+      let total = 0;
+      cart.forEach((item, i) => {
+        total += Number(item.price);
+        cartTable.innerHTML += `
+          <tr>
+            <td>${item.name}</td>
+            <td><input type='number' value='${item.price}' onchange='updatePrice(${i}, this.value)' /></td>
+            <td><button onclick='updatePrice(${i}, prompt("Nowa cena:", ${item.price}))'>Edytuj</button></td>
+            <td><button onclick='removeFromCart(${i})'>Usuń</button></td>
+          </tr>`;
+      });
+      totalSpan.textContent = total.toFixed(2);
+    }
+
+    function addToCart(name, price) {
+      cart.push({ name, price });
+      saveCart();
+      renderCart();
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      saveCart();
+      renderCart();
+    }
+
+    function updatePrice(index, newPrice) {
+      cart[index].price = parseFloat(newPrice);
+      saveCart();
+      renderCart();
+    }
+
+    function saveCart() {
+      localStorage.setItem("grenton_cart", JSON.stringify(cart));
+    }
+
+    renderProducts();
+    renderCart();
+  </script>
+</body>
+</html>

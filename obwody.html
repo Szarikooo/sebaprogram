@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Obwody</title>
+  <link rel="stylesheet" href="1.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f7f9;
+    }
+    .container {
+      text-align: center;
+      width: 90%;
+      max-width: 1000px;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    select, button, input[type="number"] {
+      padding: 8px 12px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    .total {
+      margin-top: 1rem;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .menu-button {
+      display: inline-block;
+      margin-top: 20px;
+      background-color: #3498db;
+      color: white;
+      padding: 10px 25px;
+      border-radius: 8px;
+      font-size: 16px;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+    .menu-button:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Obwody</h1>
+
+    <label for="obwod">Wybierz obwód:</label>
+    <select id="obwod"></select>
+    <button onclick="dodajObwod()">Dodaj</button>
+
+    <table id="tabela">
+      <thead>
+        <tr>
+          <th>Nazwa</th>
+          <th>Ilość</th>
+          <th>Cena jednostkowa</th>
+          <th>Razem</th>
+          <th>Usuń</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="total" id="suma">Suma: 0 zł</div>
+
+    <a href="index.html" class="menu-button">Powrót do menu</a>
+  </div>
+
+  <script>
+    const daneObwodow = [
+      { nazwa: "Oświetlenie", cena: 12 },
+      { nazwa: "Gniazda", cena: 15 },
+      { nazwa: "Rolety", cena: 20 },
+      { nazwa: "Ogrzewanie", cena: 30 },
+      { nazwa: "Klimatyzacja", cena: 25 }
+    ];
+
+    const select = document.getElementById("obwod");
+    const tbody = document.querySelector("#tabela tbody");
+    const sumaDiv = document.getElementById("suma");
+
+    daneObwodow.forEach(el => {
+      const option = document.createElement("option");
+      option.value = el.nazwa;
+      option.textContent = el.nazwa + " - " + el.cena + " zł";
+      option.dataset.cena = el.cena;
+      select.appendChild(option);
+    });
+
+    function dodajObwod() {
+      const selected = select.options[select.selectedIndex];
+      const nazwa = selected.value;
+      const cena = parseFloat(selected.dataset.cena);
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${nazwa}</td>
+        <td><input type="number" value="1" min="1" onchange="przelicz()"></td>
+        <td>${cena}</td>
+        <td class="razem">${cena}</td>
+        <td><button onclick="usun(this)">🗑</button></td>
+      `;
+      tbody.appendChild(tr);
+      przelicz();
+    }
+
+    function przelicz() {
+      let suma = 0;
+      document.querySelectorAll("#tabela tbody tr").forEach(tr => {
+        const ilosc = parseInt(tr.querySelector("input").value);
+        const cena = parseFloat(tr.children[2].textContent);
+        const razem = ilosc * cena;
+        tr.querySelector(".razem").textContent = razem.toFixed(2);
+        suma += razem;
+      });
+      sumaDiv.textContent = "Suma: " + suma.toFixed(2) + " zł";
+    }
+
+    function usun(btn) {
+      btn.closest("tr").remove();
+      przelicz();
+    }
+  </script>
+</body>
+</html
