@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Wybrane Produkty</title>
+  <link rel="stylesheet" href="1.css">
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    input[type='text'], input[type='number'] { width: 150px; }
+    button { padding: 6px 12px; margin: 2px; }
+  </style>
+</head>
+<body>
+  <h1>Twoje Zapisane Produkty</h1>
+
+  <table id="savedTable">
+    <thead>
+      <tr><th>Produkt</th><th>Cena (zł)</th><th>Usuń</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <p><strong>Łączny koszt:</strong> <span id="total">0</span> zł</p>
+
+  <h3>Dodaj nowy produkt</h3>
+  <input type="text" id="newName" placeholder="Nazwa produktu">
+  <input type="number" id="newPrice" placeholder="Cena">
+  <button onclick="addProduct()">Dodaj</button>
+
+  <script>
+    let cart = JSON.parse(localStorage.getItem("grenton_cart")) || [];
+
+    const tableBody = document.querySelector("#savedTable tbody");
+    const totalSpan = document.getElementById("total");
+
+    function renderSaved() {
+      tableBody.innerHTML = "";
+      let total = 0;
+      cart.forEach((item, i) => {
+        total += Number(item.price);
+        tableBody.innerHTML += `
+          <tr>
+            <td>${item.name}</td>
+            <td>${item.price}</td>
+            <td><button onclick='removeProduct(${i})'>Usuń</button></td>
+          </tr>`;
+      });
+      totalSpan.textContent = total.toFixed(2);
+    }
+
+    function addProduct() {
+      const name = document.getElementById("newName").value;
+      const price = parseFloat(document.getElementById("newPrice").value);
+      if (name && !isNaN(price)) {
+        cart.push({ name, price });
+        localStorage.setItem("grenton_cart", JSON.stringify(cart));
+        renderSaved();
+        document.getElementById("newName").value = "";
+        document.getElementById("newPrice").value = "";
+      } else {
+        alert("Podaj poprawną nazwę i cenę.");
+      }
+    }
+
+    function removeProduct(index) {
+      cart.splice(index, 1);
+      localStorage.setItem("grenton_cart", JSON.stringify(cart));
+      renderSaved();
+    }
+
+    renderSaved();
+  </script>
+</body>
+</html>
